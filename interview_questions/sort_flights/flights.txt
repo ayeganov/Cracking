@@ -1,0 +1,8 @@
+CAL,ALM
+CHG,BOS
+RIO,CHG
+AMS,CAL
+BOS,AMS
+
+
+#RIO -> CHG -> BOS -> AMS -> CAL

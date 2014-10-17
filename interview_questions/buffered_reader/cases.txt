@@ -1,0 +1,6 @@
+1) Buffer empty, request < 4K
+2) Buffer empty, request >= 4K
+
+3) Buffer not-empty, request < 4K
+4) Buffer not-empty, request >= 4K
+5) Buffer not-empty partially filled
