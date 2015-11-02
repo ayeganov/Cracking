@@ -32,10 +32,9 @@ class BuyableItem : public CartItem
 {
 public:
     BuyableItem(double price, std::string type);
+    virtual ~BuyableItem() {}
     void apply_discount(const ItemList& items) {}
     void apply_discount(double percent_off);
-
-private:
 };
 
 BuyableItem::BuyableItem(double price, std::string type)
@@ -173,12 +172,10 @@ public:
     Cart() {}
     void empty_cart();
     void add_item(const CartItemPtr&& item);
-    void add_coupon(const CartItemPtr&& coupon);
     double total_price();
 
 private:
     ItemList m_items;
-    ItemList m_coupons;
 
     void reset_discounts();
 };
@@ -186,7 +183,6 @@ private:
 void Cart::empty_cart()
 {
     m_items.clear();
-    m_coupons.clear();
 }
 
 void Cart::reset_discounts()
@@ -202,21 +198,15 @@ void Cart::add_item(const CartItemPtr&& item)
     m_items.emplace_back(item);
 }
 
-void Cart::add_coupon(const CartItemPtr&& coupon)
-{
-    m_coupons.emplace_back(coupon);
-    m_items.emplace_back(coupon);
-}
-
 
 double Cart::total_price()
 {
     reset_discounts();
     double total_price = 0.0;
 
-    for(const CartItemPtr& coupon : m_coupons)
+    for(const CartItemPtr& item : m_items)
     {
-        coupon->apply_discount(m_items);
+        item->apply_discount(m_items);
     }
     for(const CartItemPtr& item : m_items)
     {
@@ -230,19 +220,19 @@ int main(int argc, char* argv[])
 {
     Cart cart;
     cart.add_item(std::make_shared<BuyableItem>(10.0, "stamps"));
-    cart.add_coupon(std::make_shared<AllItemsOffCoupon>(0.25));
+    cart.add_item(std::make_shared<AllItemsOffCoupon>(0.25));
     std::cout << "Total price with 25\% off on everything " << cart.total_price() << std::endl;
 
     cart.empty_cart();
 
-    cart.add_coupon(std::make_shared<NextItemOffCoupon>(0.5));
+    cart.add_item(std::make_shared<NextItemOffCoupon>(0.5));
     cart.add_item(std::make_shared<BuyableItem>(30, "Stuff"));
     cart.add_item(std::make_shared<BuyableItem>(30, "More stuff"));
     std::cout << "Total price 50\% off on next item " << cart.total_price() << std::endl;
 
     cart.empty_cart();
 
-    cart.add_coupon(std::make_shared<NthOfTypeOffCoupon>(0.9, 3, "stuff"));
+    cart.add_item(std::make_shared<NthOfTypeOffCoupon>(0.9, 3, "stuff"));
     cart.add_item(std::make_shared<BuyableItem>(30, "stuff"));
     cart.add_item(std::make_shared<BuyableItem>(30, "stuff"));
     cart.add_item(std::make_shared<BuyableItem>(50, "stuff"));
@@ -252,10 +242,11 @@ int main(int argc, char* argv[])
     cart.empty_cart();
 
     cart.add_item(std::make_shared<BuyableItem>(10.0, "stamps"));
-    cart.add_coupon(std::make_shared<NextItemOffCoupon>(0.5));
+    cart.add_item(std::make_shared<NextItemOffCoupon>(0.5));
     cart.add_item(std::make_shared<BuyableItem>(50, "stuff"));
-    cart.add_coupon(std::make_shared<NthOfTypeOffCoupon>(0.9, 2, "stuff"));
-    cart.add_coupon(std::make_shared<AllItemsOffCoupon>(0.25));
+    cart.add_item(std::make_shared<NthOfTypeOffCoupon>(0.9, 2, "stuff"));
+    cart.add_item(std::make_shared<AllItemsOffCoupon>(0.25));
+    cart.add_item(std::make_shared<BuyableItem>(100, "stuff"));
     cart.add_item(std::make_shared<BuyableItem>(100, "stuff"));
 
     std::cout << "Total price with many coupons " << cart.total_price() << std::endl;
