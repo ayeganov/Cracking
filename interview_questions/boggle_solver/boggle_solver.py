@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 import argparse
-import collections
-import cPickle
 import os
 import time
 
@@ -97,9 +95,9 @@ def find_words(grid, trie):
         raise ValueError("Trie can not be None.")
 
     words = []
-    for i in xrange(len(grid)):
-        for j in xrange(len(grid[0])):
-            words.extend(dfs(grid=grid, trie=trie, start=(i,j)))
+    for i in range(len(grid)):
+        for j in range(len(grid[0])):
+            words.extend(dfs(grid=grid, trie=trie, start=(i, j)))
 
     return words
 
@@ -188,7 +186,7 @@ def read_dict_file(path):
     if not os.path.isfile(path):
         raise ValueError("Path must point to a regular file.")
 
-    with open(path) as f:
+    with open(path, encoding="ISO-8859-1") as f:
         whole_file = f.read()
 
     return whole_file.split("\n")
@@ -230,12 +228,12 @@ def main():
     words = read_dict_file(args.dict)
     start = time.time()
     trie = TrieNode.createTrie(words=words)
-    print "Trie creation time:", time.time() - start
+    print("Trie creation time:", time.time() - start)
 
     grid = read_grid_file(args.grid)
     start = time.time()
     words = find_words(grid, trie)
-    print "Found %s words in %s seconds %s" % (len(words), time.time() - start, words)
+    print("Found %s words in %s seconds %s" % (len(words), time.time() - start, words))
 
 
 if __name__ == "__main__":
